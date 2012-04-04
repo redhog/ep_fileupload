@@ -1,0 +1,14 @@
+{
+  "parts": [
+    {
+      "name": "fileupload",
+      "hooks": {
+        "expressConfigure": "ep_fileupload/hooks:expressConfigure",
+	"expressCreateServer": "ep_fileupload/hooks:expressServer",
+	"eejsBlock_editbarMenuLeft": "ep_fileupload/hooks:eejsBlock_editbarMenuLeft",
+	"eejsBlock_scripts": "ep_fileupload/hooks:eejsBlock_scripts",
+	"eejsBlock_styles": "ep_fileupload/hooks:eejsBlock_styles"
+      }
+    }
+  ]
+}

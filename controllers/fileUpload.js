@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 RedHog, Egil Möller <egil.moller@piratpartiet.se>
+ * Copyright 2009, 2011 RedHog, Egil Möller <egil.moller@piratpartiet.se>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,73 +14,49 @@
  * limitations under the License.
  */
 
-import("faststatic");
-import("dispatch.{Dispatcher,PrefixMatcher,forward}");
+var crypto = require('crypto');
+var fs = require('fs');
+var path = require('path');
+var formidable = require('formidable');
+var eejs = require("ep_etherpad-lite/node/eejs");
 
-import("etherpad.utils.*");
-import("etherpad.collab.server_utils");
-import("etherpad.globals.*");
-import("etherpad.log");
-import("etherpad.pad.padusers");
-import("etherpad.pro.pro_utils");
-import("etherpad.helpers");
-import("etherpad.pro.pro_accounts.getSessionProAccount");
-import("sqlbase.sqlbase");
-import("sqlbase.sqlcommon");
-import("sqlbase.sqlobj");
-import("plugins.fileUpload.models");
-import("etherpad.pad.padutils");
-jimport("org.apache.commons.fileupload");
+var hashFile = function (file, hash, digest, cb) {
+  if (digest === undefined) digest = 'hex';
+  if (hash === undefined) hash = 'md5';
+ 
+  var state = crypto.createHash(hash);
 
-function onRequest() {  
-  var isPro = pro_utils.isProDomainRequest();
-  var userId = padusers.getUserId();
-
-  helpers.addClientVars({
-    userAgent: request.headers["User-Agent"],
-    debugEnabled: request.params.djs,
-    clientIp: request.clientAddr,
-    colorPalette: COLOR_PALETTE,
-    serverTimestamp: +(new Date),
-    isProPad: isPro,
-    userIsGuest: padusers.isGuest(userId),
-    userId: userId
+  var stream = fs.createReadStream(file, {});
+  stream.on("data", function(data){
+    state.update(data);
   });
+  stream.on("error", function(err){
+    cb(err, null);
+  });
+  stream.on("close", function(){
+    cb(null, state.digest(digest));
+  });
+}
 
-  var isProUser = (isPro && ! padusers.isGuest(userId));
+exports.onRequest = function (req, res) {
+  var form = new formidable.IncomingForm();
+  form.uploadDir = path.normalize(path.join(__dirname, "..", "upload"));
+  form.parse(req, function(err, fields, files) {
+    if (err) throw err;
 
-  if (request.isPost) {
-    var uploads = [];
-    var itemFactory = new fileupload.disk.DiskFileItemFactory();
-    var handler = new fileupload.servlet.ServletFileUpload(itemFactory);
-    var items = handler.parseRequest(request.underlying).toArray();
-    for (var i = 0; i < items.length; i++)
-      if (!items[i].isFormField()) {
-        uploads.push(request.scheme + '://' + request.host + '/up/' + models.storeFile(items[i]));
-    }
+    var tmp = files.uploadfile.path;
+    var extension = files.uploadfile.filename.split('.').pop();
 
-    response.setContentType("text/html");
-    response.write(renderTemplateAsString(
-        "fileUploaded.ejs",
-        {
-          uploads: uploads,
-	  isPro: isPro,
-	  isProAccountHolder: isProUser,
-	  account: getSessionProAccount() // may be falsy
-        },
-       ['fileUpload']));
-    if (request.acceptsGzip) {
-      response.setGzip(true);
-    }
-  } else {
-    renderHtml(
-      "fileUpload.ejs",
-      {
-        isPro: isPro,
-        isProAccountHolder: isProUser,
-        account: getSessionProAccount() // may be falsy
-      },
-      ['fileUpload']);
-  }
-  return true;
+    hashFile(tmp, undefined, undefined, function (err, hash) {
+      var name = hash + "." + extension;
+      var perm = path.normalize(path.join(__dirname, "..", "upload", name));
+      fs.rename(tmp, perm, function(err) {
+        fs.unlink(tmp, function() {
+          if (err) throw err;
+          // FIXME: Calculate URL for real, with path prefix and with https handling
+          res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: 'http://' + req.headers.host + "/up/" + name}));
+        });
+      });
+    });
+  });
 }
