@@ -54,7 +54,7 @@ exports.onRequest = function (req, res) {
         fs.unlink(tmp, function() {
           if (err) throw err;
           // FIXME: Calculate URL for real, with path prefix and with https handling
-          res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: 'http://' + req.headers.host + "/up/" + name}));
+            res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: 'http://' + req.headers.host + "/up/" + name}, module));
         });
       });
     });
