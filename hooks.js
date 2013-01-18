@@ -1,5 +1,5 @@
 var path = require('path')
-  , async = require('ep_etherpad-lite/node_modules/express')
+  , express = require('ep_etherpad-lite/node_modules/express')
   , eejs = require("ep_etherpad-lite/node/eejs")
   , controller = require("./controllers/fileUpload");
 
