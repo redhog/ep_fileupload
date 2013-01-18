@@ -25,10 +25,9 @@ function uploadFileClicked () {
 }
 
 function submitClicked() {
-  console.log("UPLAOD");
   $('#fileUploadForm').ajaxSubmit({
     complete: function (XMLHttpRequest, textStatus) {
-      console.log([textStatus, XMLHttpRequest]);
+      // console.log([textStatus, XMLHttpRequest]);
     }
    
   });
