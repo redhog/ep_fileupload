@@ -1,9 +1,11 @@
 {
   "name": "ep_fileupload",
   "description": "File upload",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "RedHog (Egil Moeller) <egil.moller@freecode.no>",
-  "contributors": [],
-  "dependencies": { "formidable": "latest" },
-  "engines": { "node": ">= 0.4.1 < 0.7.0" }
+  "contributors": ["johnyma22 (John McLear) <john@mclear.co.uk>"],
+  "dependencies": {
+    "formidable": ">= 1.0.11"
+  },
+  "engines": { "node": "*" }
 }

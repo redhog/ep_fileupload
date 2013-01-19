@@ -1,7 +1,7 @@
-var path = require('path');
-var express = require('express');
-var eejs = require("ep_etherpad-lite/node/eejs");
-var controller = require("./controllers/fileUpload");
+var path = require('path')
+  , express = require('ep_etherpad-lite/node_modules/express')
+  , eejs = require("ep_etherpad-lite/node/eejs")
+  , controller = require("./controllers/fileUpload");
 
 exports.expressConfigure = function(hook_name, args, cb) {
 }
