@@ -1,7 +1,7 @@
 {
   "name": "ep_fileupload",
   "description": "File upload",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "RedHog (Egil Moeller) <egil.moller@freecode.no>",
   "contributors": ["johnyma22 (John McLear) <john@mclear.co.uk>"],
   "dependencies": {
