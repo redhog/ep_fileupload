@@ -45,7 +45,7 @@ exports.onRequest = function (req, res) {
     if (err) throw err;
 
     var tmp = files.uploadfile.path;
-    var extension = files.uploadfile.filename.split('.').pop();
+    var extension = files.uploadfile.name.split('.').pop();
 
     hashFile(tmp, undefined, undefined, function (err, hash) {
       var name = hash + "." + extension;
