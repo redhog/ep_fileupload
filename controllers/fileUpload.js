@@ -53,8 +53,8 @@ exports.onRequest = function (req, res) {
       fs.rename(tmp, perm, function(err) {
         fs.unlink(tmp, function() {
           if (err) throw err;
-          // FIXME: Calculate URL for real, with path prefix and with https handling
-            res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: 'http://' + req.headers.host + "/up/" + name}, module));
+          // the absolute url including domain is then calculated client-side 
+            res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: "/up/" + name}, module));
         });
       });
     });
