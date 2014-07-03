@@ -53,8 +53,13 @@ exports.onRequest = function (req, res) {
       fs.rename(tmp, perm, function(err) {
         fs.unlink(tmp, function() {
           if (err) throw err;
-          // the absolute url including domain is then calculated client-side 
-            res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: "/up/" + name}, module));
+            var regex = /^(https?:\/\/[^\/]+)\//;
+            var urlBase = 'http://' + req.headers.host;
+            var matches = regex.exec(req.headers['referer']);
+            if(typeof req.headers['referer'] != "undefined" && typeof matches[1] != "undefined"){
+              urlBase = matches[1];
+            }
+            res.send(eejs.require("ep_fileupload/templates/fileUploaded.ejs", {upload: urlBase + "/up/" + name}, module));
         });
       });
     });
